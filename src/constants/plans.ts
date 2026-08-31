@@ -66,3 +66,8 @@ export const PROSPECT_STATUSES = [
 ] as const
 
 export type ProspectStatus = (typeof PROSPECT_STATUSES)[number]['value']
+
+/** Valor del filtro para productos sin categoría. Vive aquí, y no en el
+ *  servicio, porque lo usa un componente de cliente: importarlo desde
+ *  services/catalog arrastraría Drizzle y el driver de Neon al navegador. */
+export const UNCATEGORIZED = 'sin-categoria'
