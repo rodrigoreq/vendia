@@ -43,10 +43,12 @@ export default async function CatalogoPage({
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold text-tinta sm:text-[28px]">Catálogo</h1>
+          {/* Con tope, el sustantivo concuerda con el total, no con la
+              cantidad: "1 de 15 productos", nunca "1 de 15 producto". */}
           <p className="mt-1 text-humo">
-            {totalProducts}
-            {plan.maxProducts !== null && ` de ${plan.maxProducts}`}{' '}
-            {totalProducts === 1 ? 'producto' : 'productos'}
+            {plan.maxProducts !== null
+              ? `${totalProducts} de ${plan.maxProducts} productos`
+              : `${totalProducts} ${totalProducts === 1 ? 'producto' : 'productos'}`}
           </p>
         </div>
 
