@@ -19,6 +19,12 @@ BEGIN
 END
 $$;
 
+-- El propietario debe ser miembro de app_user para poder hacer
+-- SET LOCAL ROLE app_user dentro de una transacción. Así basta una sola
+-- credencial: la aplicación baja de privilegios cuando toca datos de un
+-- vendedor, en lugar de mantener una segunda cadena de conexión.
+GRANT app_user TO CURRENT_USER;
+
 GRANT USAGE ON SCHEMA public TO app_user;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public

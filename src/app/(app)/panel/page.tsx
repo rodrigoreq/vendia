@@ -5,21 +5,15 @@ import { Alert } from '@/components/ui/Alert'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { PLANS } from '@/constants/plans'
 import { isDatabaseConfigured } from '@/lib/db'
-
-/** Métricas de ejemplo. En el paso 3 salen del CRM real. */
-const DEMO_STATS = {
-  prospects: 147,
-  products: 23,
-  imagesThisMonth: 31,
-  commissionMonth: 4850,
-}
+import { getDashboardStats } from '@/services/dashboard'
 
 export default async function PanelPage() {
   const session = await auth()
   const firstName = (session?.user?.name ?? 'Vendedor').split(' ')[0]
   const plan = session?.user?.plan ? PLANS[session.user.plan] : PLANS.basico
 
-  const imagesLeft = plan.maxImagesPerMonth - DEMO_STATS.imagesThisMonth
+  const stats = await getDashboardStats(session?.user?.id ?? null)
+  const imagesLeft = Math.max(0, plan.maxImagesPerMonth - stats.imagesThisMonth)
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -42,7 +36,7 @@ export default async function PanelPage() {
           <span aria-hidden className="flex size-10 items-center justify-center rounded-control bg-berry-50 text-berry">
             <Users className="size-5" />
           </span>
-          <p className="mt-3 font-display text-2xl font-bold text-tinta">{DEMO_STATS.prospects}</p>
+          <p className="mt-3 font-display text-2xl font-bold text-tinta">{stats.prospects}</p>
           <p className="text-sm text-humo">Prospectos activos</p>
         </Card>
 
@@ -51,7 +45,7 @@ export default async function PanelPage() {
             <Package className="size-5" />
           </span>
           <p className="mt-3 font-display text-2xl font-bold text-tinta">
-            {DEMO_STATS.products}
+            {stats.products}
             {plan.maxProducts && (
               <span className="text-base font-normal text-humo"> / {plan.maxProducts}</span>
             )}
@@ -64,7 +58,7 @@ export default async function PanelPage() {
             <Sparkles className="size-5" />
           </span>
           <p className="mt-3 font-display text-2xl font-bold text-tinta">
-            {DEMO_STATS.imagesThisMonth}
+            {stats.imagesThisMonth}
             <span className="text-base font-normal text-humo"> / {plan.maxImagesPerMonth}</span>
           </p>
           <p className="text-sm text-humo">Imágenes IA este mes</p>
@@ -76,7 +70,7 @@ export default async function PanelPage() {
             <Wallet className="size-5" />
           </span>
           <p className="mt-3 font-display text-2xl font-bold text-ciruela">
-            Bs {DEMO_STATS.commissionMonth.toLocaleString('es-BO')}
+            Bs {stats.commissionMonth.toLocaleString('es-BO')}
           </p>
           <p className="text-sm text-dorado-700">Comisión del mes</p>
         </Card>
