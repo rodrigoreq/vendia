@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* ============================================================
+   VendIA — Identidad visual
+   Tinta ciruela, dorado, berry y crema. Tono con carácter,
+   pensado para alguien que vende y gana comisión.
+   ============================================================ */
+
+@theme {
+  /* --- Tipografía --- */
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Tinta ciruela: color de marca, fondos oscuros y texto principal --- */
+  --color-ciruela-50: #f5f3f8;
+  --color-ciruela-100: #e8e4ef;
+  --color-ciruela-200: #cfc7dd;
+  --color-ciruela-400: #6b5b8f;
+  --color-ciruela-600: #3b2d5c;
+  --color-ciruela-700: #2f2349;
+  --color-ciruela: #241b3a;
+  --color-ciruela-900: #1a1329;
+  --color-ciruela-950: #120d1c;
+
+  /* --- Dorado: acento principal, CTAs, todo lo que habla de comisión --- */
+  --color-dorado-50: #fdf9f0;
+  --color-dorado-100: #f9efd8;
+  --color-dorado-200: #f0dcae;
+  --color-dorado: #d9a441;
+  --color-dorado-600: #c08f31;
+  --color-dorado-700: #9a7126;
+
+  /* --- Berry: acento secundario, etiquetas y detalles --- */
+  --color-berry-50: #fdf2f5;
+  --color-berry-100: #fbe3ea;
+  --color-berry-200: #f5c2d0;
+  --color-berry: #c6335c;
+  --color-berry-600: #ab2a4e;
+  --color-berry-700: #8b2240;
+
+  /* --- Crema: fondo general --- */
+  --color-crema: #faf7f2;
+  --color-crema-dark: #f0eae0;
+
+  /* --- Neutros de apoyo --- */
+  --color-tinta: #241b3a;
+  --color-tinta-soft: #4a4060;
+  --color-humo: #756b88;
+  --color-linea: #e5e0d8;
+  --color-linea-soft: #f2ede5;
+  --color-superficie: #ffffff;
+
+  /* --- Radios y sombras --- */
+  --radius-card: 0.875rem;
+  --radius-control: 0.5rem;
+
+  --shadow-card: 0 1px 2px 0 rgb(36 27 58 / 0.05), 0 1px 3px 0 rgb(36 27 58 / 0.07);
+  --shadow-raised: 0 4px 6px -1px rgb(36 27 58 / 0.08), 0 2px 4px -2px rgb(36 27 58 / 0.06);
+  --shadow-overlay: 0 20px 25px -5px rgb(36 27 58 / 0.15), 0 8px 10px -6px rgb(36 27 58 / 0.1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-crema);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+
+  /* Foco visible y consistente en toda la app. */
+  :focus-visible {
+    outline: 2px solid var(--color-dorado);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+  }
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+  }
+}
