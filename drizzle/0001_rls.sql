@@ -36,12 +36,17 @@ LANGUAGE sql STABLE SECURITY DEFINER AS $$
   SELECT tenant_id FROM users WHERE id = app_current_user_id();
 $$;
 
-CREATE OR REPLACE FUNCTION app_is_superadmin() RETURNS boolean
+-- SECURITY DEFINER a propósito: leer `users` desde dentro de una política
+-- SOBRE `users` volvería a disparar la política y Postgres abortaría con
+-- "infinite recursion detected in policy for relation users".
+CREATE OR REPLACE FUNCTION app_current_role() RETURNS text
 LANGUAGE sql STABLE SECURITY DEFINER AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM users
-    WHERE id = app_current_user_id() AND role = 'superadmin'
-  );
+  SELECT role FROM users WHERE id = app_current_user_id();
+$$;
+
+CREATE OR REPLACE FUNCTION app_is_superadmin() RETURNS boolean
+LANGUAGE sql STABLE AS $$
+  SELECT app_current_role() = 'superadmin';
 $$;
 
 -- ---------- Activar RLS ----------
@@ -87,7 +92,7 @@ WITH CHECK (
   app_is_superadmin()
   OR (
     id = app_current_user_id()
-    AND role = (SELECT role FROM users WHERE id = app_current_user_id())
+    AND role = app_current_role()
     AND tenant_id IS NOT DISTINCT FROM app_current_tenant_id()
   )
 );

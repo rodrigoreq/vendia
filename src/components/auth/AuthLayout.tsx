@@ -42,7 +42,9 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
           </ul>
         </div>
 
-        <p className="text-xs text-crema/40">
+        {/* crema/60 y no menos: por debajo de eso el contraste sobre
+            ciruela cae bajo el mínimo AA de 4.5:1. */}
+        <p className="text-xs text-crema/60">
           VendIA no cobra a tus clientes: cada empresa cobra directo, tú cobras tu comisión.
         </p>
       </aside>

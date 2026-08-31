@@ -53,7 +53,8 @@ export function Input({
           aria-describedby={cn(error ? errorId : undefined, hint ? hintId : undefined) || undefined}
           className={cn(
             'h-11 w-full rounded-control border bg-superficie text-sm text-tinta',
-            'placeholder:text-humo/70 transition-colors focus:outline-none',
+            // Placeholder a plena opacidad: humo/70 daba 2.8:1 sobre blanco.
+            'placeholder:text-humo transition-colors focus:outline-none',
             icon ? 'pl-10' : 'pl-3',
             trailing ? 'pr-11' : 'pr-3',
             error ? 'border-berry focus:border-berry-600' : 'border-linea focus:border-dorado',
