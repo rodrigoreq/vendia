@@ -1,4 +1,4 @@
-import { and, count, eq, isNull, sql, sum } from 'drizzle-orm'
+import { and, count, eq, isNull, ne, sql, sum } from 'drizzle-orm'
 import { isDatabaseConfigured, schema, withTenantDb } from '@/lib/db'
 
 export interface DashboardStats {
@@ -41,10 +41,18 @@ export async function getDashboardStats(userId: string | null): Promise<Dashboar
       .from(schema.products)
       .where(eq(schema.products.archived, false))
 
+    // "Activos" = los que siguen en juego. Se excluyen los cerrados (ya
+    // rindieron) y los descartados, que no tienen fecha de cierre pero
+    // tampoco son seguimiento pendiente.
     const [prospects] = await tx
       .select({ n: count() })
       .from(schema.prospects)
-      .where(isNull(schema.prospects.closedAt))
+      .where(
+        and(
+          isNull(schema.prospects.closedAt),
+          ne(schema.prospects.status, 'descartado'),
+        ),
+      )
 
     const [usage] = await tx
       .select({ n: schema.usageCounters.imagesGenerated })
