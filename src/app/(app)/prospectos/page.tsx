@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { UserPlus, Users } from 'lucide-react'
 import { auth } from '@/auth'
+import { requireSeller } from '@/lib/session'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { ProspectFilters } from '@/components/crm/ProspectFilters'
 import { ProspectRow } from '@/components/crm/ProspectRow'
-import { PLANS, type PlanId } from '@/constants/plans'
+import { PLANS } from '@/constants/plans'
 import { getProspectCounts, listProductOptions, listProspects } from '@/services/crm'
 
 export default async function ProspectosPage({
@@ -21,7 +22,8 @@ export default async function ProspectosPage({
 
   const { q, estado, producto, dias } = await searchParams
   const userId = session.user.id
-  const plan = PLANS[(session.user.plan ?? 'basico') as PlanId]
+  const { plan: planId } = await requireSeller()
+  const plan = PLANS[planId]
 
   const [counts, prospects, products] = await Promise.all([
     getProspectCounts(userId),

@@ -5,7 +5,9 @@ import { auth } from '@/auth'
 import { ProspectForm } from '@/components/crm/ProspectForm'
 import { StatusPicker } from '@/components/crm/StatusPicker'
 import { Card } from '@/components/ui/Card'
+import { WhatsAppSender } from '@/components/whatsapp/WhatsAppSender'
 import { listProductOptions, getProspect } from '@/services/crm'
+import { listTemplates } from '@/services/templates'
 import type { ProspectStatus } from '@/constants/plans'
 
 export default async function EditarProspectoPage({
@@ -18,9 +20,10 @@ export default async function EditarProspectoPage({
 
   const { id } = await params
 
-  const [prospect, products] = await Promise.all([
+  const [prospect, products, templates] = await Promise.all([
     getProspect(session.user.id, id),
     listProductOptions(session.user.id),
+    listTemplates(session.user.id, session.user.tenantId!),
   ])
 
   // getProspect pasa por RLS: el de otra cuenta llega null y se ve un 404,
@@ -64,6 +67,23 @@ export default async function EditarProspectoPage({
       <Card className="mt-5">
         <StatusPicker prospectId={prospect.id} current={status} />
       </Card>
+
+      {/* El envío va justo debajo del estado: cambiar de estado y escribirle
+          son las dos cosas que el vendedor hace en la misma visita. */}
+      <div className="mt-5">
+        <WhatsAppSender
+          phone={prospect.phone}
+          templates={templates}
+          products={prospect.products}
+          context={{
+            nombre: prospect.name.split(' ')[0],
+            producto: prospect.products[0]?.name ?? 'nuestros productos',
+            precio: '',
+            proveedor: '',
+            vendedor: session.user.name?.split(' ')[0] ?? '',
+          }}
+        />
+      </div>
 
       <div className="mt-5">
         <ProspectForm

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
+import { requireSeller } from '@/lib/session'
 import { AppShell } from '@/components/layout/AppShell'
 import { PLANS } from '@/constants/plans'
 
@@ -10,7 +11,8 @@ export default async function AppLayout({ children }: LayoutProps<'/'>) {
   // no debe confiar solo en eso.
   if (session.user.role === 'superadmin') redirect('/admin')
 
-  const plan = session.user.plan ? PLANS[session.user.plan] : null
+  const { plan: planId } = await requireSeller()
+  const plan = PLANS[planId]
 
   return (
     <AppShell

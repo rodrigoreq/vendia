@@ -162,12 +162,24 @@ export async function getProspect(userId: string, prospectId: string) {
 
     if (!prospect) return null
 
-    const productIds = await tx
-      .select({ productId: schema.prospectProducts.productId })
+    // Se traen nombre, precio y proveedor además del id: el mensaje de
+    // WhatsApp los usa como variables y así se evita una segunda consulta.
+    const products = await tx
+      .select({
+        id: schema.products.id,
+        name: schema.products.name,
+        price: schema.products.price,
+        supplier: schema.products.supplier,
+      })
       .from(schema.prospectProducts)
+      .innerJoin(schema.products, eq(schema.products.id, schema.prospectProducts.productId))
       .where(eq(schema.prospectProducts.prospectId, prospectId))
 
-    return { ...prospect, productIds: productIds.map((p) => p.productId) }
+    return {
+      ...prospect,
+      productIds: products.map((p) => p.id),
+      products,
+    }
   })
 }
 

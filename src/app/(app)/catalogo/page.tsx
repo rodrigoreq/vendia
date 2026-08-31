@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { PackagePlus, PackageSearch } from 'lucide-react'
 import { auth } from '@/auth'
+import { requireSeller } from '@/lib/session'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { CatalogFilters } from '@/components/catalogo/CatalogFilters'
 import { ProductCard } from '@/components/catalogo/ProductCard'
-import { PLANS, type PlanId } from '@/constants/plans'
+import { PLANS } from '@/constants/plans'
 import {
   countProducts,
   countUncategorized,
@@ -26,7 +27,8 @@ export default async function CatalogoPage({
 
   const { q, categoria } = await searchParams
   const userId = session.user.id
-  const plan = PLANS[(session.user.plan ?? 'basico') as PlanId]
+  const { plan: planId } = await requireSeller()
+  const plan = PLANS[planId]
 
   const [categories, products, totalProducts, uncategorized] = await Promise.all([
     listCategories(userId),
