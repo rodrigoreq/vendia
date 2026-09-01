@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { auth } from '@/auth'
+import { SessionError, requireSeller } from '@/lib/session'
 import {
   CrmError,
   changeStatus,
@@ -10,7 +10,7 @@ import {
   deleteProspect,
   updateProspect,
 } from '@/services/crm'
-import { PROSPECT_STATUSES, type PlanId, type ProspectStatus } from '@/constants/plans'
+import { PROSPECT_STATUSES, type ProspectStatus } from '@/constants/plans'
 
 export interface ActionResult {
   ok: boolean
@@ -39,20 +39,10 @@ const prospectSchema = z.object({
   productIds: z.array(z.string().uuid()).max(20).default([]),
 })
 
-async function requireSeller() {
-  const session = await auth()
-  if (!session?.user?.id || !session.user.tenantId) {
-    throw new CrmError('Sesión no válida.')
-  }
-  return {
-    userId: session.user.id,
-    tenantId: session.user.tenantId,
-    plan: (session.user.plan ?? 'basico') as PlanId,
-  }
-}
-
 function toResult(error: unknown): ActionResult {
-  if (error instanceof CrmError) return { ok: false, error: error.message }
+  if (error instanceof CrmError || error instanceof SessionError) {
+    return { ok: false, error: error.message }
+  }
   console.error('[prospectos]', error)
   return { ok: false, error: 'Ocurrió un error inesperado. Inténtalo otra vez.' }
 }

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { auth } from '@/auth'
+import { SessionError, requireSeller } from '@/lib/session'
 import {
   CatalogError,
   createCategory,
@@ -11,7 +11,6 @@ import {
   deleteProduct,
   updateProduct,
 } from '@/services/catalog'
-import type { PlanId } from '@/constants/plans'
 
 export interface ActionResult {
   ok: boolean
@@ -35,21 +34,8 @@ const productSchema = z.object({
   photoUrls: z.array(z.string().url()).max(6).default([]),
 })
 
-/** Toda acción exige sesión y un tenant: el super-admin no tiene catálogo. */
-async function requireSeller() {
-  const session = await auth()
-  if (!session?.user?.id || !session.user.tenantId) {
-    throw new CatalogError('Sesión no válida.')
-  }
-  return {
-    userId: session.user.id,
-    tenantId: session.user.tenantId,
-    plan: (session.user.plan ?? 'basico') as PlanId,
-  }
-}
-
 function toResult(error: unknown): ActionResult {
-  if (error instanceof CatalogError) {
+  if (error instanceof CatalogError || error instanceof SessionError) {
     return { ok: false, error: error.message }
   }
   console.error('[catalogo]', error)

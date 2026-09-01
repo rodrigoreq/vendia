@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, Package, Sparkles, Users, Wallet } from 'lucide-react'
 import { auth } from '@/auth'
+import { requireSeller } from '@/lib/session'
 import { Alert } from '@/components/ui/Alert'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { PLANS } from '@/constants/plans'
@@ -10,7 +11,8 @@ import { getDashboardStats } from '@/services/dashboard'
 export default async function PanelPage() {
   const session = await auth()
   const firstName = (session?.user?.name ?? 'Vendedor').split(' ')[0]
-  const plan = session?.user?.plan ? PLANS[session.user.plan] : PLANS.basico
+  const { plan: planId } = await requireSeller()
+  const plan = PLANS[planId]
 
   const stats = await getDashboardStats(session?.user?.id ?? null)
   const imagesLeft = Math.max(0, plan.maxImagesPerMonth - stats.imagesThisMonth)
